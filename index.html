@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B2 Speaking Practice Recorder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .topic-selection {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .topic-details {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+
+        .topic-details.show {
+            display: block;
+        }
+
+        .topic-details h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .topic-details p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .recorder-section {
+            margin: 30px 0;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .timer {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer.recording {
+            color: #dc3545;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .status {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+            min-height: 24px;
+        }
+
+        .status.recording {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        button {
+            padding: 14px 32px;
+            margin: 8px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+        }
+
+        .playback-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .playback-section.show {
+            display: block;
+        }
+
+        audio {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .student-info {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+        }
+
+        .student-info input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            margin-top: 8px;
+        }
+
+        .student-info input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .instructions {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .instructions h4 {
+            color: #856404;
+            margin-bottom: 8px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            color: #856404;
+        }
+
+        .instructions li {
+            margin: 5px 0;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .warning {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            color: #721c24;
+            font-size: 14px;
+        }
+
+        .outline-section {
+            margin: 30px 0;
+            padding: 25px;
+            background: #f8fffe;
+            border-radius: 12px;
+            border-left: 4px solid #28a745;
+        }
+
+        .outline-section label {
+            color: #28a745;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .outline-section textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+            line-height: 1.6;
+            transition: border-color 0.3s;
+        }
+
+        .outline-section textarea:focus {
+            outline: none;
+            border-color: #28a745;
+        }
+
+        .outline-tip {
+            margin-top: 12px;
+            color: #666;
+            font-size: 14px;
+            font-style: italic;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 B2 Speaking Practice Recorder</h1>
+        <p class="subtitle">Section 5: Extended Response Topics</p>
+
+        <div class="instructions">
+            <h4>📝 Instructions</h4>
+            <ul>
+                <li>Choose a topic from the dropdown menu</li>
+                <li>Write an outline of your main points in the text box</li>
+                <li>Review your outline and prepare your response</li>
+                <li>Speak for 1-2 minutes when ready</li>
+                <li>Listen to your recording and re-record if needed</li>
+                <li>Submit when satisfied with your response</li>
+            </ul>
+        </div>
+
+        <div class="student-info">
+            <label for="studentName">Student Name:</label>
+            <input type="text" id="studentName" placeholder="Enter your full name">
+        </div>
+
+        <div class="topic-selection">
+            <label for="topicSelect">Select Your Topic:</label>
+            <select id="topicSelect">
+                <option value="">-- Choose a topic --</option>
+                <option value="topic1">Topic 1: Your Daily Routine</option>
+                <option value="topic2">Topic 2: An Important Person</option>
+                <option value="topic3">Topic 3: A Memorable Experience</option>
+                <option value="topic4">Topic 4: Future Plans</option>
+                <option value="topic5">Topic 5: Technology in Your Life</option>
+                <option value="topic6">Topic 6: Hobbies and Interests</option>
+            </select>
+
+            <div id="topicDetails" class="topic-details"></div>
+        </div>
+
+        <div id="outlineSection" class="outline-section" style="display: none;">
+            <label for="outline">📋 Outline Your Main Points:</label>
+            <textarea 
+                id="outline" 
+                placeholder="Write your outline here...&#10;&#10;Example:&#10;• Introduction: Brief opening statement&#10;• Point 1: First main idea with example&#10;• Point 2: Second main idea with example&#10;• Point 3: Third main idea with example&#10;• Conclusion: Final thoughts"
+                rows="10"
+            ></textarea>
+            <p class="outline-tip">💡 Tip: Use this space to organize your thoughts before recording. You don't need to write full sentences—just key points and examples you want to mention.</p>
+        </div>
+
+        <div class="recorder-section">
+            <div class="timer" id="timer">00:00</div>
+            <div class="status" id="status">Ready to record</div>
+            
+            <div class="controls">
+                <button id="startBtn" class="btn-primary">
+                    <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                        <circle cx="10" cy="10" r="8"/>
+                    </svg>
+                    Start Recording
+                </button>
+                <button id="stopBtn" class="btn-danger" disabled>
+                    <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                        <rect x="6" y="6" width="8" height="8"/>
+                    </svg>
+                    Stop Recording
+                </button>
+                <button id="resetBtn" class="btn-secondary" disabled>
+                    <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"/>
+                    </svg>
+                    Reset
+                </button>
+            </div>
+
+            <div id="playbackSection" class="playback-section">
+                <h3>Your Recording</h3>
+                <audio id="audioPlayback" controls></audio>
+                <button id="submitBtn" class="btn-success">
+                    <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M8.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l2-2a1 1 0 00-1.414-1.414L11 7.586V3a1 1 0 10-2 0v4.586l-.293-.293z"/>
+                        <path d="M3 5a2 2 0 012-2h1a1 1 0 010 2H5v7h2l1 2h4l1-2h2V5h-1a1 1 0 110-2h1a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5z"/>
+                    </svg>
+                    Submit Recording
+                </button>
+            </div>
+
+            <div id="warningMessage" class="warning" style="display: none;">
+                ⚠️ Recording will automatically stop at 2 minutes.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const topics = {
+            topic1: {
+                title: "Topic 1: Your Daily Routine",
+                description: "Describe a typical day in your life. What do you do in the morning, afternoon, and evening? What activities do you enjoy most and why?"
+            },
+            topic2: {
+                title: "Topic 2: An Important Person",
+                description: "Talk about someone who has influenced you. Who is this person? How did you meet them? Why are they important to you?"
+            },
+            topic3: {
+                title: "Topic 3: A Memorable Experience",
+                description: "Describe an experience that you will never forget. What happened? Who was with you? Why was it so memorable?"
+            },
+            topic4: {
+                title: "Topic 4: Future Plans",
+                description: "What are your plans for the next five years? What do you hope to achieve? What steps do you need to take to reach your goals?"
+            },
+            topic5: {
+                title: "Topic 5: Technology in Your Life",
+                description: "How do you use technology in your daily life? What devices do you use most often? Do you think technology has improved your life? Why or why not?"
+            },
+            topic6: {
+                title: "Topic 6: Hobbies and Interests",
+                description: "What do you like to do in your free time? How did you become interested in this hobby? What do you enjoy most about it?"
+            }
+        };
+
+        let mediaRecorder;
+        let audioChunks = [];
+        let startTime;
+        let timerInterval;
+        let audioBlob;
+
+        const topicSelect = document.getElementById('topicSelect');
+        const topicDetails = document.getElementById('topicDetails');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const timer = document.getElementById('timer');
+        const status = document.getElementById('status');
+        const playbackSection = document.getElementById('playbackSection');
+        const audioPlayback = document.getElementById('audioPlayback');
+        const studentName = document.getElementById('studentName');
+        const warningMessage = document.getElementById('warningMessage');
+        const outlineSection = document.getElementById('outlineSection');
+        const outline = document.getElementById('outline');
+
+        // Topic selection handler
+        topicSelect.addEventListener('change', (e) => {
+            const selectedTopic = topics[e.target.value];
+            if (selectedTopic) {
+                topicDetails.innerHTML = `
+                    <h3>${selectedTopic.title}</h3>
+                    <p>${selectedTopic.description}</p>
+                `;
+                topicDetails.classList.add('show');
+                outlineSection.style.display = 'block';
+                startBtn.disabled = false;
+            } else {
+                topicDetails.classList.remove('show');
+                outlineSection.style.display = 'none';
+                startBtn.disabled = true;
+            }
+        });
+
+        // Start recording
+        startBtn.addEventListener('click', async () => {
+            if (!studentName.value.trim()) {
+                alert('Please enter your name before recording.');
+                studentName.focus();
+                return;
+            }
+
+            if (!topicSelect.value) {
+                alert('Please select a topic before recording.');
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    audioPlayback.src = audioUrl;
+                    playbackSection.classList.add('show');
+                    stream.getTracks().forEach(track => track.stop());
+                };
+
+                mediaRecorder.start();
+                startTime = Date.now();
+                startTimer();
+
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                topicSelect.disabled = true;
+                studentName.disabled = true;
+                outline.disabled = true;
+                status.textContent = 'Recording in progress...';
+                status.classList.add('recording');
+                timer.classList.add('recording');
+                warningMessage.style.display = 'block';
+
+            } catch (error) {
+                alert('Unable to access microphone. Please check your permissions.');
+                console.error('Error accessing microphone:', error);
+            }
+        });
+
+        // Stop recording
+        stopBtn.addEventListener('click', () => {
+            stopRecording();
+        });
+
+        // Reset
+        resetBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to reset? Your current recording will be lost.')) {
+                audioChunks = [];
+                audioBlob = null;
+                playbackSection.classList.remove('show');
+                resetTimer();
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                resetBtn.disabled = true;
+                topicSelect.disabled = false;
+                studentName.disabled = false;
+                outline.disabled = false;
+                status.textContent = 'Ready to record';
+                status.classList.remove('recording');
+                timer.classList.remove('recording');
+                warningMessage.style.display = 'none';
+            }
+        });
+
+        // Submit recording
+        submitBtn.addEventListener('click', () => {
+            if (!audioBlob) {
+                alert('No recording available to submit.');
+                return;
+            }
+
+            const selectedTopic = topicSelect.options[topicSelect.selectedIndex].text;
+            const fileName = `${studentName.value.trim()}_${selectedTopic.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().slice(0,10)}.webm`;
+            
+            const url = URL.createObjectURL(audioBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.click();
+
+            alert(`Recording saved as: ${fileName}\n\nPlease submit this file to your instructor for evaluation.`);
+        });
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const seconds = Math.floor(elapsed / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+
+                timer.textContent = `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+
+                // Auto-stop at 2 minutes
+                if (seconds >= 120) {
+                    stopRecording();
+                }
+            }, 100);
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                clearInterval(timerInterval);
+                stopBtn.disabled = true;
+                resetBtn.disabled = false;
+                status.textContent = 'Recording complete';
+                status.classList.remove('recording');
+                timer.classList.remove('recording');
+                warningMessage.style.display = 'none';
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timer.textContent = '00:00';
+        }
+    </script>
+</body>
+</html>
